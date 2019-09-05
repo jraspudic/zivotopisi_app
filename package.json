@@ -1,0 +1,19 @@
+{
+  "name": "zivotopisi",
+  "version": "1.0.0",
+  "description": "web app sa zivotopisima profesora sveucilista u mostaru",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "jr",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "cookie-parser": "^1.4.4",
+    "ejs": "^2.7.1",
+    "express": "^4.17.1",
+    "method-override": "^3.0.0",
+    "mongoose": "^5.6.12"
+  }
+}
