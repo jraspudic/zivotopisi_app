@@ -20,9 +20,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("views")); //omogucava serviranje statickih fajlova u browser
 app.set("view engine", "ejs");
 app.use(methodOverride("_method"));
-app.use("/", require("./routes/profesor"));
-app.use("/fakulteti", require("./routes/fakultet"));
 
+app.use("/fakulteti", require("./routes/fakultet"));
+app.use("/", require("./routes/profesor"));
 const port = process.env.PORT || 5000;
 
 app.listen(port, () => console.log(`Server started on port ${port}`));

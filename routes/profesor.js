@@ -25,14 +25,21 @@ router.post("/", (req, res) => {
 
 //new route
 router.get("/dodaj", (req, res) => {
-  res.render("createProfesor");
+  Fakultet.find({}, (err, sviFakulteti) => {
+    if (err) {
+      console.log(err);
+    } else {
+      res.render("createProfesor", { fakulteti: sviFakulteti });
+    }
+  });
 });
 
 //show route
 router.get("/:id", (req, res) => {
   Profesor.findById(req.params.id, function(err, pronadjenProfesor) {
     if (err) {
-      console.log(err);
+      console.log("Tražen je nepostojeci korisnik");
+      res.redirect("/");
     } else {
       res.render("profesor.ejs", { profesor: pronadjenProfesor });
     }
@@ -42,7 +49,7 @@ router.get("/:id", (req, res) => {
 router.get("/:id/edit", (req, res) => {
   Profesor.findById(req.params.id, function(err, pronadjenProfesor) {
     if (err) {
-      console.log(err);
+      console.log("Tražen je nepostojeci korisnik");
       res.redirect("/");
     } else {
       res.render("editProfesor", { profesor: pronadjenProfesor });
@@ -56,7 +63,7 @@ router.put("/:id", (req, res) => {
     editovanProfesor
   ) {
     if (err) {
-      console.log("error");
+      console.log("Tražen je nepostojeci korisnik");
       res.redirect("/");
     } else {
       idProfesora = editovanProfesor._id;
@@ -69,8 +76,10 @@ router.put("/:id", (req, res) => {
 //destroy route
 router.delete("/:id", function(req, res) {
   Profesor.findByIdAndDelete(req.params.id, function(err, profesor) {
-    if (err) console.log("error");
-    else console.log("profesor pobrisan: " + profesor);
+    if (err) {
+      console.log("Tražen je nepostojeci korisnik");
+      res.redirect("/");
+    } else console.log("profesor pobrisan: " + profesor);
   });
 
   res.redirect("/");

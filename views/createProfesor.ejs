@@ -23,13 +23,17 @@
           placeholder="Prezime"
         />
 
-        <label for="lname">Mail</label>
-        <input
-          type="text"
-          id="lname"
-          name="profesor[mail]"
-          placeholder="Mail"
-        />
+        <label for="mail">Mail</label>
+        <input type="text" id="mail" name="profesor[mail]" placeholder="Mail" />
+
+        <label for="ustanovaZaposlenja">Ustanova Zaposlenja</label>
+        <select name="profesor[ustanovaZaposlenja]" id="ustanovaZaposlenja">
+          <% fakulteti.forEach(function(fakultet){ %>
+          <option value="<%-fakultet._id%>">
+            <%- fakultet.naziv %>
+          </option>
+          <% }); %>
+        </select>
 
         <input type="submit" value="Submit" />
       </form>
