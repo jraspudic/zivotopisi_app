@@ -4,27 +4,47 @@ const express = require("express"),
   bodyParser = require("body-parser"),
   Profesor = require("../models/Profesor"),
   Fakultet = require("../models/Fakultet"),
-  methodOverride = require("method-override");
+  User = require("../models/User");
+methodOverride = require("method-override");
+var passwordGenerator = require("generate-password");
 app.use(bodyParser.urlencoded({ extended: true }));
-//index route
-router.get("/", (req, res) => {
-  Profesor.find({}, (err, profesori) => {
-    if (err) console.log("err");
-    else res.render("profesori", { profesori: profesori });
-  });
-});
 
 //create route
-router.post("/", (req, res) => {
+router.post("/", isAdmin, (req, res) => {
   Profesor.create(req.body.profesor, function(err, noviProfesor) {
-    if (err) console.log("error");
-    else console.log("Dodan novi profesor: " + noviProfesor);
+    if (err) console.log("Error kod dodavanja profesora");
+    else {
+      var password = passwordGenerator.generate({
+        length: 20,
+        numbers: true
+      });
+      var newUser = new User({
+        username: req.body.profesor.mail
+      });
+
+      User.findOne({ username: req.body.profesor.mail }, function(err, user) {
+        if (user) {
+          console.log("Postoji user/profesor vec");
+          res.redirect("/profesor/add");
+        }
+      });
+      User.register(newUser, password, function(err, user) {
+        console.log(password);
+        if (err) {
+          console.log(err);
+          return res.redirect("/profesor/add");
+        } else {
+          res.redirect("/");
+        }
+      });
+      console.log("Dodan novi profesor: " + noviProfesor);
+    }
   });
   res.redirect("/");
 });
 
 //new route
-router.get("/dodaj", (req, res) => {
+router.get("/add", isAdmin, (req, res) => {
   Fakultet.find({}, (err, sviFakulteti) => {
     if (err) {
       console.log(err);
@@ -38,26 +58,25 @@ router.get("/dodaj", (req, res) => {
 router.get("/:id", (req, res) => {
   Profesor.findById(req.params.id, function(err, pronadjenProfesor) {
     if (err) {
-      console.log("Tražen je nepostojeci korisnik");
+      console.log("Tražen je nepostojeci korisnik111111");
       res.redirect("/");
     } else {
-      res.render("profesor.ejs", { profesor: pronadjenProfesor });
+      res.json(pronadjenProfesor);
     }
   });
 });
 //edit route
-router.get("/:id/edit", (req, res) => {
+router.get("/:id/edit", isAdmin, (req, res) => {
   Profesor.findById(req.params.id, function(err, pronadjenProfesor) {
     if (err) {
-      console.log("Tražen je nepostojeci korisnik");
       res.redirect("/");
     } else {
-      res.render("editProfesor", { profesor: pronadjenProfesor });
+      res.json(pronadjenProfesor);
     }
   });
 });
 //update route
-router.put("/:id", (req, res) => {
+router.put("/:id", isAdmin, (req, res) => {
   Profesor.findByIdAndUpdate(req.params.id, req.body.profesor, function(
     err,
     editovanProfesor
@@ -74,7 +93,7 @@ router.put("/:id", (req, res) => {
 });
 
 //destroy route
-router.delete("/:id", function(req, res) {
+router.delete("/:id", isAdmin, function(req, res) {
   Profesor.findByIdAndDelete(req.params.id, function(err, profesor) {
     if (err) {
       console.log("Tražen je nepostojeci korisnik");
@@ -84,5 +103,15 @@ router.delete("/:id", function(req, res) {
 
   res.redirect("/");
 });
+
+function isAdmin(req, res, next) {
+  if (req.user == undefined) {
+    return res.redirect("/");
+  } else if (req.user.isAdmin == false) {
+    return res.redirect("/");
+  }
+  next();
+}
+//AUTH routes
 
 module.exports = router;

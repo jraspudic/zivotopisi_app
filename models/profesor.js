@@ -28,7 +28,7 @@ var profesorSchema = new mongoose.Schema({
     ]
   },
   predmetiKojeIzvodi: [{ naziv: String }],
-  studjiNaKojimaPredaje: [
+  studijiNaKojimaPredaje: [
     {
       type: mongoose.Schema.ObjectId,
       ref: "Studij"

@@ -11,7 +11,7 @@
     <h3>Dodaj profesora</h3>
 
     <div>
-      <form action="/" method="post">
+      <form action="/profesor" method="post">
         <label for="fname">Ime</label>
         <input type="text" id="fname" name="profesor[ime]" placeholder="Ime" />
 
@@ -23,17 +23,13 @@
           placeholder="Prezime"
         />
 
-        <label for="mail">Mail</label>
-        <input type="text" id="mail" name="profesor[mail]" placeholder="Mail" />
-
-        <label for="ustanovaZaposlenja">Ustanova Zaposlenja</label>
-        <select name="profesor[ustanovaZaposlenja]" id="ustanovaZaposlenja">
-          <% fakulteti.forEach(function(fakultet){ %>
-          <option value="<%-fakultet._id%>">
-            <%- fakultet.naziv %>
-          </option>
-          <% }); %>
-        </select>
+        <label for="lname">Mail</label>
+        <input
+          type="text"
+          id="lname"
+          name="profesor[mail]"
+          placeholder="Mail"
+        />
 
         <input type="submit" value="Submit" />
       </form>
