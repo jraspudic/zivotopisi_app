@@ -20,13 +20,19 @@
         <button
           type="button"
           class="btn btn-primary"
-          onclick="location.href = '/profesor/<%-profesor._id%>/edit'"
+          onclick="location.href = '/profesor /<%-profesor._id%>/edit'"
         >
           Edituj
         </button>
         <form action="/profesor/<%=profesor._id%>?_method=DELETE" method="post">
           <button type="submit" class="btn btn-danger">
             Pobriši
+          </button>
+        </form>
+        <form action="/sendCredentials" method="post">
+          <button type="submit" class="btn btn-success">
+            <input hidden type="text" name="mail" value="<%= profesor.mail%>" />
+            Pošalji šifru
           </button>
         </form>
       </div>

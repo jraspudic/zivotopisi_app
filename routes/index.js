@@ -97,22 +97,24 @@ router.delete("/users/:id", isHeadAdmin, (req, res) => {
 });
 /*********************************** RESET PASSWORD *******************/
 
-router.post("/forgot", function(req, res, next) {
+router.post("/sendCredentials", function(req, res, next) {
+  console.log("tusmo");
   async.waterfall(
     [
       function(done) {
         crypto.randomBytes(20, function(err, buf) {
           var token = buf.toString("hex");
+          console.log("token je: >>>>>>>>>>>>>>>" + token + "<<<<<<<<<<<<<<");
           done(err, token);
         });
       },
       function(token, done) {
-        User.findOne({ username: req.body.email }, function(err, user) {
+        User.findOne({ username: req.body.mail }, function(err, user) {
           if (!user) {
-            req.flash("error", "No account with that email address exists.");
-            return res.render("forgotFailed");
+            console.log("Error, user nije pronadjen");
+            res.redirect("/");
           }
-
+          console.log("JUZER je: >>>>>>>>>>>>>>>" + user + "<<<<<<<<<<<<<<");
           user.resetPasswordToken = token;
           user.resetPasswordExpires = Date.now() + 3600000; // 1 sat
 
@@ -125,33 +127,32 @@ router.post("/forgot", function(req, res, next) {
         var smtpTransport = nodemailer.createTransport({
           service: "Gmail",
           auth: {
-            user: "jurica.raspudic@gmail.com",
-            pass: process.env.GMAILPW
+            user: "appzivotopisi@gmail.com",
+            pass: "sveucilisteMostar309"
           }
         });
         var mailOptions = {
           to: user.username,
-          from: "jurica.raspudic@gmail.com",
-          subject: "GamingArena password reset",
+          from: "appzivotopisi@gmail.com",
+          subject: "Podaci za login SUMzivotopisi",
           text:
-            "You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n" +
-            "Please click on the following link, or paste this into your browser to complete the process:\n\n" +
-            "https://gamingarena.club" +
+            "Stipice ako si dobio ovaj mejl znaci da radi sve hehe idemo ga branit iduci tjedan" +
+            "https://localhost:5000" +
             "/reset/" +
             token +
             "\n\n" +
-            "If you did not request this, please ignore this email and your password will remain unchanged.\n"
+            "Otiđite na ovaj link te unesite sifru za Vaš SUMzivotopisi korisnički račun.\n"
         };
         smtpTransport.sendMail(mailOptions, function(err) {
           console.log("mail sent");
-          res.render("forgotSent", { email: user.username });
+          //res.render("forgotSent", { email: user.username });
           done(err, "done");
         });
       }
     ],
     function(err) {
       if (err) return next(err);
-      res.redirect("/forgot");
+      res.redirect("/");
     }
   );
 });
@@ -167,7 +168,7 @@ router.get("/reset/:token", function(req, res) {
         req.flash("error", "Password reset token is invalid or has expired.");
         return res.redirect("/forgot");
       }
-      res.render("reset", { token: req.params.token });
+      res.render("promjeniSifru", { token: req.params.token });
     }
   );
 });
@@ -183,11 +184,10 @@ router.post("/reset/:token", function(req, res) {
           },
           function(err, user) {
             if (!user) {
-              req.flash(
-                "error",
-                "Password reset token is invalid or has expired."
+              console.log(
+                "Error password reset token ne postoji ili je istekao"
               );
-              return res.redirect("back");
+              return res.redirect("/");
             }
             if (req.body.password === req.body.confirm) {
               user.setPassword(req.body.password, function(err) {
@@ -201,7 +201,7 @@ router.post("/reset/:token", function(req, res) {
                 });
               });
             } else {
-              req.flash("error", "Passwords do not match.");
+              console.log("Error, sifre se ne podudaraju");
               return res.redirect("back");
             }
           }
@@ -211,22 +211,20 @@ router.post("/reset/:token", function(req, res) {
         var smtpTransport = nodemailer.createTransport({
           service: "Gmail",
           auth: {
-            user: "gamingarena5454@gmail.com",
+            user: "appzivotopisi@gmail.com",
             pass: process.env.GMAILPW
           }
         });
         var mailOptions = {
           to: user.email,
-          from: "gamingarena5454@gmail.com",
-          subject: "Your password has been changed",
+          from: "appzivotopisi@gmail.com",
+          subject: "SUMzivotopisi uspješno registriranje",
           text:
-            "Hello,\n\n" +
-            "This is a confirmation that the password for your account " +
-            user.email +
-            " has just been changed.\n"
+            "Pozdrav,\n\n" +
+            "Ova je potrvrda da ste uspješno registrirali vaš SUMzivotopisi korisnički račun"
         };
         smtpTransport.sendMail(mailOptions, function(err) {
-          req.flash("success", "Success! Your password has been changed.");
+          console.log("Uspješno promjenjena šifra");
           done(err);
         });
       }

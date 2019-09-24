@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Promjena sifre</title>
+  </head>
+  <body>
+    <h1>Mjenjaj sifru bre</h1>
+    <form action="/reset/<%=token%>" method="post">
+      <input
+        id="id_pass"
+        type="password"
+        name="password"
+        value=""
+        placeholder="Nova sifra"
+      />
+
+      <input
+        id="id_confim"
+        type="password"
+        name="confirm"
+        value=""
+        placeholder="Potvrdite sifru"
+      />
+
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+  </body>
+</html>
