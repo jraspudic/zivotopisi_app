@@ -19,10 +19,11 @@ router.post("/", isAdmin, (req, res) => {
         numbers: true
       });
       var newUser = new User({
-        username: req.body.profesor.mail
+        username: noviProfesor.mail,
+        profesorId: noviProfesor._id
       });
 
-      User.findOne({ username: req.body.profesor.mail }, function(err, user) {
+      User.findOne({ profesorId: noviProfesor._id }, function(err, user) {
         if (user) {
           console.log("Postoji user/profesor vec");
           res.redirect("/profesor/add");
@@ -61,22 +62,23 @@ router.get("/:id", (req, res) => {
       console.log("Tražen je nepostojeci korisnik111111");
       res.redirect("/");
     } else {
-      res.json(pronadjenProfesor);
+      res.render("profesor", { profesor: pronadjenProfesor });
     }
   });
 });
 //edit route
-router.get("/:id/edit", isAdmin, (req, res) => {
+router.get("/:id/edit", isAdminOrProfesor, (req, res) => {
   Profesor.findById(req.params.id, function(err, pronadjenProfesor) {
     if (err) {
       res.redirect("/");
     } else {
-      res.json(pronadjenProfesor);
+      res.render("editProfesor", { profesor: pronadjenProfesor });
     }
   });
 });
+
 //update route
-router.put("/:id", isAdmin, (req, res) => {
+router.put("/:id", isAdminOrProfesor, (req, res) => {
   Profesor.findByIdAndUpdate(req.params.id, req.body.profesor, function(
     err,
     editovanProfesor
@@ -85,20 +87,46 @@ router.put("/:id", isAdmin, (req, res) => {
       console.log("Tražen je nepostojeci korisnik");
       res.redirect("/");
     } else {
+      User.findOneAndUpdate(
+        { profesorId: req.params.id },
+        { username: req.body.profesor.mail },
+        (err, editovanUser) => {
+          if (err) {
+            console.log(err);
+            console.log("Error kod editovonja prof usera");
+          } else {
+            console.log("Editovan juzer je " + editovanUser);
+            //console.log("User uspjesno editovan: " + editovanUser.username);
+          }
+        }
+      );
+
       idProfesora = editovanProfesor._id;
       console.log("profesor ažuriran: " + editovanProfesor);
-      res.redirect("/" + editovanProfesor._id);
+      res.redirect("/profesor/" + editovanProfesor._id);
     }
   });
 });
 
 //destroy route
 router.delete("/:id", isAdmin, function(req, res) {
-  Profesor.findByIdAndDelete(req.params.id, function(err, profesor) {
+  Profesor.findByIdAndDelete(req.params.id, function(err, pobrisanProfesor) {
     if (err) {
       console.log("Tražen je nepostojeci korisnik");
       res.redirect("/");
-    } else console.log("profesor pobrisan: " + profesor);
+    } else {
+      User.findOneAndRemove(
+        { profesorId: pobrisanProfesor._id },
+        (err, pobrisanUser) => {
+          if (err) {
+            console.log("Error delete route for user");
+          } else {
+            console.log("User je pobrisan: " + pobrisanUser);
+          }
+        }
+      );
+      console.log("profesor pobrisan: " + pobrisanProfesor);
+    }
   });
 
   res.redirect("/");
@@ -108,6 +136,18 @@ function isAdmin(req, res, next) {
   if (req.user == undefined) {
     return res.redirect("/");
   } else if (req.user.isAdmin == false) {
+    return res.redirect("/");
+  }
+  next();
+}
+
+function isAdminOrProfesor(req, res, next) {
+  if (req.user == undefined) {
+    return res.redirect("/");
+  } else if (
+    req.user.isAdmin == false &&
+    req.user.profesorId != req.params.id
+  ) {
     return res.redirect("/");
   }
   next();

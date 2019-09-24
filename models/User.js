@@ -5,6 +5,7 @@ var UserSchema = new mongoose.Schema({
   username: { type: String, unique: true, required: true },
   isAdmin: { type: Boolean, default: false },
   isHeadAdmin: { type: Boolean, default: false },
+  profesorId: { type: mongoose.Schema.ObjectId, ref: "Profesor" },
   resetPasswordToken: { type: String },
   resetPasswordExpires: { type: Date }
 });
